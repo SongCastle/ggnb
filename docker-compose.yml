@@ -1,0 +1,10 @@
+version: '3'
+services:
+  ggnb:
+    build:
+      context: '.'
+    volumes:
+      - ./go:/go/src/github.com/SongCastle/ggnb
+    env_file:
+        - .env
+    tty: true
