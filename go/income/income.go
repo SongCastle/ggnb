@@ -30,10 +30,7 @@ func ToPayload(payload interface{}) (*bytes.Buffer, error) {
 	if err := msg.Init(payload); err != nil {
 		return nil, err
 	}
-	if !msg.NeedToDeliver() {
-		return nil, nil
-	}
-	return msg.ToPayload(), nil
+	return msg.ToPayload()
 }
 
 func ToDummyPayload() (*bytes.Buffer, error) {
