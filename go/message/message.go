@@ -4,8 +4,6 @@ import "bytes"
 
 type Message interface {
 	Init(payload interface{}) error
-	NeedToDeliver() bool
-	ToPayload() *bytes.Buffer
-
+	ToPayload() (*bytes.Buffer, error)
 	ToDummyPayload() *bytes.Buffer
 }

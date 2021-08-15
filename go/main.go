@@ -36,6 +36,8 @@ func send(msg *bytes.Buffer) error {
 		fmt.Println("Skipped\n")
 		return nil
 	}
+	fmt.Printf("payload: %s\n", msg.String())
+
 	out := outcome.New()
 	err := out.Post(msg)
 	if err != nil {

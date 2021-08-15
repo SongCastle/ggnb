@@ -8,14 +8,23 @@ import (
 	"github.com/google/go-github/v38/github"
 )
 
+type commitCommentEvent = github.CommitCommentEvent
+type createEvent = github.CreateEvent
+type deleteEvent = github.DeleteEvent
+type issueCommentEvent = github.IssueCommentEvent
+type issuesEvent = github.IssuesEvent
+type pullRequestEvent = github.PullRequestEvent
+type pullRequestReviewEvent = github.PullRequestReviewEvent
+type pullRequestReviewCommentEvent = github.PullRequestReviewCommentEvent
+type pullRequestTargetEvent = github.PullRequestTargetEvent
+type pushEvent = github.PushEvent
+
 const EventHeader = "x-github-event"
 
 type fields = map[string]interface{}
 
 type GitHubMessage struct {
-	sender *string
-	action string
-	body *string
+	event interface{}
 	target bool
 }
 
@@ -43,92 +52,35 @@ func (gm *GitHubMessage) Init(payload interface{}) error {
 	if err != nil {
 		return err
 	}
-	// TODO: メッセージを充実する
-	gm.target = true
-	switch event := event.(type) {
-	case *github.CommitCommentEvent:
-		gm.sender = event.GetSender().Login
-		gm.action = "コメントされました"
-		gm.body = event.GetComment().Body
-	case *github.CreateEvent:
-		ref := event.GetRef()
-		gm.sender = event.GetSender().Login
-		gm.action = "ブランチ・タグが作成されました" // refType での判断も可能
-		gm.body = &ref
-	case *github.DeleteEvent:
-		ref := event.GetRef()
-		gm.sender = event.GetSender().Login
-		gm.action = "ブランチ・タグが削除されました" // refType での判断も可能
-		gm.body = &ref
-	case *github.IssueCommentEvent:
-		gm.sender = event.GetSender().Login
-		gm.action = fmt.Sprintf("コメントが変更されました (%s)", event.GetAction())
-		gm.body = event.GetIssue().URL
-	case *github.IssuesEvent:
-		gm.sender = event.GetSender().Login
-		gm.action = fmt.Sprintf("PR / Issue (%s)", event.GetAction())
-		gm.body = event.GetIssue().URL
-	case *github.PullRequestEvent:
-		gm.sender = event.GetSender().Login
-		gm.action = fmt.Sprintf("PR (%s)", event.GetAction())
-		gm.body = event.GetPullRequest().URL
-	case *github.PullRequestReviewEvent:
-		gm.sender = event.GetSender().Login
-		gm.action = fmt.Sprintf("PR (%s)", event.GetAction())
-		gm.body = event.GetPullRequest().URL
-	case *github.PullRequestReviewCommentEvent: // PullRequestTargetEvent
-		gm.sender = event.GetSender().Login
-		gm.action = fmt.Sprintf("PR (%s)", event.GetAction())
-		gm.body = event.GetPullRequest().URL
-	case *github.PushEvent:
-		ref := event.GetRef()
-		gm.sender = event.GetSender().Login
-		gm.action = "プッシュされました"
-		gm.body = &ref
-	default:
-		gm.target = false
-	}
+	gm.event = event
 	return nil
 }
 
-func (gm *GitHubMessage) NeedToDeliver() bool {
-	return gm.target
-}
-
-func (gm *GitHubMessage) ToPayload() *bytes.Buffer {
-	return bytes.NewBufferString(
-		fmt.Sprintf(
-			`
-			{
-				"attachments": [
-					{
-						"fallback": "GitHub Notifitation",
-						"color": "#2eb886",
-						"title": "GitHub Notification",
-						"title_link": "https://api.slack.com/",
-						"fields": [
-							{
-								"title": "アカウント",
-								"value": "%s",
-								"short": true
-							},
-							{
-								"title": "アクション",
-								"value": "%s",
-								"short": true
-							},
-							{
-								"title": "内容",
-								"value": "%s",
-								"short": true
-							}
-						]
-					}
-				]
-			}
-			`, *gm.sender, gm.action, *gm.body,
-		),
-	)
+func (gm *GitHubMessage) ToPayload() (*bytes.Buffer, error) {
+	switch event := gm.event.(type) {
+	case *commitCommentEvent:
+		return buildCommitCommentEvent(event)
+	case *createEvent:
+		return buildCreateEvent(event)
+	case *deleteEvent:
+		return buildDeleteEvent(event)
+	case *issueCommentEvent:
+		return buildIssueCommentEvent(event)
+	case *issuesEvent:
+		return buildIssuesEvent(event)
+	case *pullRequestEvent:
+		return buildPullRequestEvent(event)
+	case *pullRequestReviewEvent:
+		return buildPullRequestReviewEvent(event)
+	case *pullRequestReviewCommentEvent:
+		return buildPullRequestReviewCommentEvent(event)
+	case *pullRequestTargetEvent:
+		return buildPullRequestTargetEvent(event)
+	case *pushEvent:
+		return buildPushEvent(event)
+	default:
+		return nil, nil
+	}
 }
 
 func (gm *GitHubMessage) ToDummyPayload() *bytes.Buffer {
