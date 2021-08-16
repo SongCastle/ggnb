@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/SongCastle/ggnb/income"
+	"github.com/SongCastle/ggnb/income/builder"
 	"github.com/SongCastle/ggnb/outcome"
 	"github.com/aws/aws-lambda-go/lambda"
 )
@@ -16,8 +17,7 @@ const DEBUG = "DEBUG"
 func receive(payload interface{}) (*bytes.Buffer, error) {
 	_payload, err := income.ToPayload(payload)
 	if err != nil {
-		fmt.Printf("Failed: %v\n", err)
-		return nil, err
+		return nil, reportError(err)
 	}
 	return _payload, nil
 }
@@ -25,8 +25,7 @@ func receive(payload interface{}) (*bytes.Buffer, error) {
 func receiveDummy() (*bytes.Buffer, error) {
 	_payload, err := income.ToDummyPayload()
 	if err != nil {
-		fmt.Printf("Failed: %v\n", err)
-		return nil, err
+		return nil, reportError(err)
 	}
 	return _payload, nil
 }
@@ -41,8 +40,7 @@ func send(msg *bytes.Buffer) error {
 	out := outcome.New()
 	err := out.Post(msg)
 	if err != nil {
-		fmt.Printf("Failed: %v\n", err)
-		return err
+		return reportError(err)
 	}
 	return nil
 }
@@ -65,6 +63,19 @@ func HandleDummyRequest() error {
 
 func onLambda() bool {
 	return os.Getenv(DEBUG) == ""
+}
+
+func reportError(err error) error {
+	fmt.Printf("Failed: %v\n", err)
+	if msg, err := builder.BuildError(err); err != nil {
+		fmt.Printf("Report Failed: %v\n", err)
+	} else {
+		out := outcome.New()
+		if err := out.Post(msg); err != nil {
+			fmt.Printf("Report Failed: %v\n", err)
+		}
+	}
+	return err
 }
 
 func main() {

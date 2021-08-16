@@ -53,12 +53,13 @@ func (sc *slackClient) Post(buff *bytes.Buffer) error {
 		return err
 	}
 
-	fmt.Printf(
+	msg := fmt.Sprintf(
 		"Status: %s, StatusCode %d, Body: %s\n",
 		resp.Status, resp.StatusCode, string(bodyBytes),
 	)
+	fmt.Println(msg)
 	if resp.StatusCode != 200 {
-		return errors.New("Failed to Post")
+		return errors.New(msg)
 	}
 
 	return nil
