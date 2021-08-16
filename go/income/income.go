@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/SongCastle/ggnb/message"
+	"github.com/SongCastle/ggnb/income/message"
 )
 
 const (
@@ -38,5 +38,5 @@ func ToDummyPayload() (*bytes.Buffer, error) {
 	if err != nil {
 		return nil, err
 	}
-	return msg.ToDummyPayload(), nil
+	return msg.ToDummyPayload()
 }
