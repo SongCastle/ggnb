@@ -2,65 +2,25 @@ package outcome
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
-	"io"
-	"net/http"
-	"os"
 )
 
-const WebHookUrl = "SLACK_WEBHOOK_URL"
-
-type client interface {
-	Init(string)
-	Post(buff *bytes.Buffer) error
-}
-
-type slackClient struct {
-	webHookUrl string
-}
-
-func New() client {
+func new() client {
 	sc := slackClient{}
-	sc.Init(os.Getenv(WebHookUrl))
+	sc.Init()
 	return &sc
 }
 
-func (sc *slackClient) Init(webHookUrl string) {
-	sc.webHookUrl = webHookUrl
-}
-
-func (sc *slackClient) Post(buff *bytes.Buffer) error {
-	if sc.webHookUrl == "" {
-		return errors.New("WebhookUrl is brank")
+func Send(msg *bytes.Buffer) error {
+	if msg == nil {
+		fmt.Println("Skipped\n")
+		return nil
 	}
+	fmt.Printf("payload: %s\n", msg.String())
 
-	req, err := http.NewRequest("POST", sc.webHookUrl, buff)
-	req.Header.Add("Content-Type", "application/json")
-	if err != nil {
+	client := new()
+	if err := client.Post(msg); err != nil {
 		return err
 	}
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	defer resp.Body.Close()
-	if err != nil {
-		return err
-	}
-
-	bodyBytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
-	msg := fmt.Sprintf(
-		"Status: %s, StatusCode %d, Body: %s\n",
-		resp.Status, resp.StatusCode, string(bodyBytes),
-	)
-	fmt.Println(msg)
-	if resp.StatusCode != 200 {
-		return errors.New(msg)
-	}
-
 	return nil
 }

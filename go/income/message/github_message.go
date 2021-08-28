@@ -10,6 +10,8 @@ import (
 	"github.com/google/go-github/v38/github"
 )
 
+const EventHeader = "x-github-event"
+
 type commitCommentEvent = github.CommitCommentEvent
 type createEvent = github.CreateEvent
 type deleteEvent = github.DeleteEvent
@@ -20,8 +22,6 @@ type pullRequestReviewEvent = github.PullRequestReviewEvent
 type pullRequestReviewCommentEvent = github.PullRequestReviewCommentEvent
 type pullRequestTargetEvent = github.PullRequestTargetEvent
 type pushEvent = github.PushEvent
-
-const EventHeader = "x-github-event"
 
 type fields = map[string]interface{}
 
