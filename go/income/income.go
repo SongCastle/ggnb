@@ -10,11 +10,11 @@ import (
 )
 
 const (
-	GitHubType = "github"
 	TypeEnv = "INCOME_TYPE"
+	GitHubType = "github"
 )
 
-func New() (message.Message, error) {
+func newMessage() (message.Message, error) {
 	switch os.Getenv(TypeEnv) {
 	case GitHubType:
 		return &message.GitHubMessage{}, nil
@@ -23,7 +23,7 @@ func New() (message.Message, error) {
 }
 
 func ToPayload(payload interface{}) (*bytes.Buffer, error) {
-	msg, err := New()
+	msg, err := newMessage()
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func ToPayload(payload interface{}) (*bytes.Buffer, error) {
 }
 
 func ToDummyPayload() (*bytes.Buffer, error) {
-	msg, err := New()
+	msg, err := newMessage()
 	if err != nil {
 		return nil, err
 	}

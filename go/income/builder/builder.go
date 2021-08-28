@@ -3,7 +3,6 @@ package builder
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 )
 
@@ -63,9 +62,6 @@ func NewAttachment() *attachment {
 }
 
 func BuildError(err error) (*bytes.Buffer, error) {
-	if err == nil {
-		return nil, errors.New("no error")
-	}
 	a := NewAttachment()
 	a.Color = sToP(ErrorColor)
 	a.InsertField("エラー", fmt.Sprintf("%v", err))
@@ -74,7 +70,7 @@ func BuildError(err error) (*bytes.Buffer, error) {
 
 func getShort(short ...bool) bool {
 	if len(short) == 0 {
-		return false	
+		return false
 	}
 	return short[0]
 }
