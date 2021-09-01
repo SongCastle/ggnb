@@ -1,40 +1,24 @@
 package handler
 
-import (
-	"fmt"
-	"os"
-
-	"github.com/SongCastle/ggnb/income/builder"
-	"github.com/SongCastle/ggnb/outcome"
-)
+import "os"
 
 const DEBUG = "DEBUG"
 
-type Handler interface {
+type handler interface {
+	Init() error
 	Start()
 }
 
-func New() Handler {
+func New() handler {
+	var h handler
 	if onLambda() {
-		return &lamdaHandler{}
+		h = &lambdaHandler{}
+	} else {
+		h = &localHandler{}
 	}
-	return &localHandler{}
+	return h
 }
 
 func onLambda() bool {
 	return os.Getenv(DEBUG) == ""
-}
-
-func reportErrorIf(err error) error {
-	if err != nil {
-		fmt.Printf("Failed: %v\n", err)
-		if msg, err := builder.BuildError(err); err != nil {
-			fmt.Printf("Report Failed: %v\n", err)
-		} else {
-			if err := outcome.Send(msg); err != nil {
-				fmt.Printf("Report Failed: %v\n", err)
-			}
-		}
-	}
-	return err
 }

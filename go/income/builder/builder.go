@@ -7,11 +7,11 @@ import (
 )
 
 const (
-	Fallback = "GitHub Notifitation"
 	Color = "#2eb67d"
-	Title = "GitHub Notification"
-	TitileLink = "https://github.com/SongCastle/ggnb"
 	ErrorColor = "#e01e5a"
+	Fallback = "GitHub Notifitation"
+	TitileLink = "https://github.com/SongCastle/ggnb"
+	Title = "GitHub Notification"
 )
 
 type field struct {
@@ -21,27 +21,29 @@ type field struct {
 }
 
 type attachment struct {
-	Fallback *string `json:"fallback"`
 	Color *string `json:"color"`
-	Title *string `json:"title"`
-	TitileLink *string `json:"title_link"`
+	Fallback *string `json:"fallback"`
 	Fields []*field `json:"fields"`
+	TitileLink *string `json:"title_link"`
+	Title *string `json:"title"`
 }
 
 func (a *attachment) InsertField(title, value string, short ...bool) {
-	a.Fields = append(
-		a.Fields,
-		&field{Title: &title, Value: &value, Short: getShort(short...)},
-	)
+	if title != "" && value != "" {
+		a.Fields = append(
+			a.Fields,
+			&field{Title: &title, Value: &value, Short: getShort(short...)},
+		)
+	}
 }
 
 func (a *attachment) Build() (*bytes.Buffer, error) {
-	p := payloadBuilder{Attachment: []*attachment{a}}
+	p := payloadBuilder{Attachments: []*attachment{a}}
 	return p.Build()
 }
 
 type payloadBuilder struct {
-	Attachment []*attachment `json:"attachments"`
+	Attachments []*attachment `json:"attachments"`
 }
 
 func (pb *payloadBuilder) Build() (*bytes.Buffer, error) {
@@ -54,16 +56,16 @@ func (pb *payloadBuilder) Build() (*bytes.Buffer, error) {
 
 func NewAttachment() *attachment {
 	return &attachment{
-		Fallback: sToP(Fallback),
-		Color: sToP(Color),
-		Title: sToP(Title),
-		TitileLink: sToP(TitileLink),
+		Color: toP(Color),
+		Fallback: toP(Fallback),
+		TitileLink: toP(TitileLink),
+		Title: toP(Title),
 	}
 }
 
 func BuildError(err error) (*bytes.Buffer, error) {
 	a := NewAttachment()
-	a.Color = sToP(ErrorColor)
+	a.Color = toP(ErrorColor)
 	a.InsertField("エラー", fmt.Sprintf("%v", err))
 	return a.Build()
 }
@@ -75,6 +77,6 @@ func getShort(short ...bool) bool {
 	return short[0]
 }
 
-func sToP(s string) *string {
+func toP(s string) *string {
 	return &s
 }

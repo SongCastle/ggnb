@@ -27,26 +27,6 @@ type fields = map[string]interface{}
 
 type GitHubMessage struct {
 	event interface{}
-	target bool
-}
-
-func (gm *GitHubMessage) toGitHubEvent(payload interface{}) (interface{}, error) {
-	_payload := payload.(fields)
-	// check header
-	headers, ok := _payload["headers"]
-	if !ok {
-		return nil, errors.New(fmt.Sprintf("missing headers"))
-	}
-	eventType, ok := headers.(fields)[EventHeader]
-	if !ok {
-		return nil, errors.New(fmt.Sprintf("missing %s header", EventHeader))
-	}
-	// check body
-	body, ok := _payload["body"]
-	if !ok {
-		return nil, errors.New(fmt.Sprintf("missing body"))
-	}
-	return github.ParseWebHook(eventType.(string), []byte(body.(string)))
 }
 
 func (gm *GitHubMessage) Init(payload interface{}) error {
@@ -56,6 +36,28 @@ func (gm *GitHubMessage) Init(payload interface{}) error {
 	}
 	gm.event = event
 	return nil
+}
+
+func (gm *GitHubMessage) toGitHubEvent(payload interface{}) (interface{}, error) {
+	_payload, ok := payload.(fields)
+	if !ok {
+		return nil,  errors.New("invalid payload")
+	}
+	// check header
+	headers, ok := _payload["headers"]
+	if !ok {
+		return nil, errors.New("missing headers")
+	}
+	eventType, ok := headers.(fields)[EventHeader]
+	if !ok {
+		return nil, errors.New(fmt.Sprintf("missing %s header", EventHeader))
+	}
+	// check body
+	body, ok := _payload["body"]
+	if !ok {
+		return nil, errors.New("missing body")
+	}
+	return github.ParseWebHook(eventType.(string), []byte(body.(string)))
 }
 
 func (gm *GitHubMessage) ToPayload() (*bytes.Buffer, error) {
