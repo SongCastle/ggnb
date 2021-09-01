@@ -13,7 +13,7 @@ const WebHookUrl = "SLACK_WEBHOOK_URL"
 
 type client interface {
 	Init()
-	Post(buff *bytes.Buffer) error
+	Post(buff *bytes.Buffer) ([]byte, error)
 }
 
 type slackClient struct {
@@ -24,37 +24,44 @@ func (sc *slackClient) Init() {
 	sc.webHookUrl = os.Getenv(WebHookUrl)
 }
 
-func (sc *slackClient) Post(msg *bytes.Buffer) error {
+func (sc *slackClient) Post(msg *bytes.Buffer) ([]byte, error) {
 	if sc.webHookUrl == "" {
-		return errors.New("WebhookUrl is brank")
+		return nil, errors.New("WebhookUrl is brank")
 	}
+	body, err := sc.request(msg)
+	if err != nil {
+		return nil, err
+	}
+	return body, nil
+}
 
+func (sc *slackClient) request(msg *bytes.Buffer) ([]byte, error) {
 	req, err := http.NewRequest("POST", sc.webHookUrl, msg)
 	req.Header.Add("Content-Type", "application/json")
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	defer resp.Body.Close()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	bodyBytes, err := io.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	result := fmt.Sprintf(
 		"Status: %s, StatusCode %d, Body: %s",
-		resp.Status, resp.StatusCode, string(bodyBytes),
+		resp.Status, resp.StatusCode, string(body),
 	)
-
 	fmt.Println(result)
+
 	if resp.StatusCode != 200 {
-		return errors.New(result)
+		return nil, errors.New(result)
 	}
-	return nil
+	return body, nil
 }

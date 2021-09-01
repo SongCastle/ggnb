@@ -14,29 +14,40 @@ const (
 	GitHubType = "github"
 )
 
-func newMessage() (message.Message, error) {
+func NewManager() (AbstractManager, error) {
+	m := &Manager{}
+	if err := m.Init(); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+type AbstractManager interface {
+	Init() error
+	ToPayload(payload interface{}) (*bytes.Buffer, error)
+	ToDummyPayload() (*bytes.Buffer, error)
+}
+
+type Manager struct {
+	message message.Message
+}
+
+func (m *Manager) Init() error {
 	switch os.Getenv(TypeEnv) {
 	case GitHubType:
-		return &message.GitHubMessage{}, nil
+		m.message = &message.GitHubMessage{}
+		return nil
 	}
-	return nil, errors.New(fmt.Sprintf("Invalid %s", TypeEnv))
+	return errors.New(fmt.Sprintf("Invalid %s", TypeEnv))
 }
 
-func ToPayload(payload interface{}) (*bytes.Buffer, error) {
-	msg, err := newMessage()
-	if err != nil {
+func (m *Manager) ToPayload(payload interface{}) (*bytes.Buffer, error) {
+	if err := m.message.Init(payload); err != nil {
 		return nil, err
 	}
-	if err := msg.Init(payload); err != nil {
-		return nil, err
-	}
-	return msg.ToPayload()
+	return m.message.ToPayload()
 }
 
-func ToDummyPayload() (*bytes.Buffer, error) {
-	msg, err := newMessage()
-	if err != nil {
-		return nil, err
-	}
-	return msg.ToDummyPayload()
+func (m *Manager) ToDummyPayload() (*bytes.Buffer, error) {
+	return m.message.ToDummyPayload()
 }
