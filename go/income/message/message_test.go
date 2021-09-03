@@ -11,6 +11,34 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestNewMessage(t *testing.T) {
+	assert := assert.New(t)
+	beforeType := os.Getenv(TypeEnv)
+
+	t.Run("without type", func(t *testing.T) {
+		if err := os.Unsetenv(TypeEnv); err != nil {
+			t.Fatal(err)
+		}
+		_, err := NewMessage()
+		assert.EqualError(err, fmt.Sprintf("Invalid %s", TypeEnv))
+	})
+
+	t.Run("GitHub", func(t *testing.T) {
+		if err := os.Setenv(TypeEnv, GitHubType); err != nil {
+			t.Fatal(err)
+		}
+		msg, err := NewMessage()
+		assert.Nil(err)
+		assert.IsType(msg, &GitHubMessage{})
+	})
+
+	t.Cleanup(func(){
+		if err := os.Setenv(TypeEnv, beforeType); err != nil {
+			t.Fatal(err)
+		}
+	})
+}
+
 func TestGitHubMessageInit(t *testing.T) {
 	t.Parallel()
 	assert := assert.New(t)
@@ -60,7 +88,7 @@ func TestGitHubMessageToPayload(t *testing.T) {
 
 	t.Run("commit_comment", func(t *testing.T) {
 		gm := GitHubMessage{}
-		json, err := os.ReadFile("./test_data/commit_comment.json")
+		json, err := os.ReadFile("./testdata/commit_comment.json")
 		if err != nil {
 			t.Error(err)
 		}
@@ -93,7 +121,7 @@ func TestGitHubMessageToPayload(t *testing.T) {
 
 	t.Run("create", func(t *testing.T) {
 		gm := GitHubMessage{}
-		json, err := os.ReadFile("./test_data/create.json")
+		json, err := os.ReadFile("./testdata/create.json")
 		if err != nil {
 			t.Error(err)
 		}
@@ -125,7 +153,7 @@ func TestGitHubMessageToPayload(t *testing.T) {
 
 	t.Run("delete", func(t *testing.T) {
 		gm := GitHubMessage{}
-		json, err := os.ReadFile("./test_data/delete.json")
+		json, err := os.ReadFile("./testdata/delete.json")
 		if err != nil {
 			t.Error(err)
 		}
@@ -157,7 +185,7 @@ func TestGitHubMessageToPayload(t *testing.T) {
 
 	t.Run("issue_comment", func(t *testing.T) {
 		gm := GitHubMessage{}
-		json, err := os.ReadFile("./test_data/issue_comment.json")
+		json, err := os.ReadFile("./testdata/issue_comment.json")
 		if err != nil {
 			t.Error(err)
 		}
@@ -189,7 +217,7 @@ func TestGitHubMessageToPayload(t *testing.T) {
 
 	t.Run("issues", func(t *testing.T) {
 		gm := GitHubMessage{}
-		json, err := os.ReadFile("./test_data/issues.json")
+		json, err := os.ReadFile("./testdata/issues.json")
 		if err != nil {
 			t.Error(err)
 		}
@@ -222,7 +250,7 @@ func TestGitHubMessageToPayload(t *testing.T) {
 
 	t.Run("pull_request", func(t *testing.T) {
 		gm := GitHubMessage{}
-		json, err := os.ReadFile("./test_data/pull_request.json")
+		json, err := os.ReadFile("./testdata/pull_request.json")
 		if err != nil {
 			t.Error(err)
 		}
@@ -255,7 +283,7 @@ func TestGitHubMessageToPayload(t *testing.T) {
 
 	t.Run("pull_request_review", func(t *testing.T) {
 		gm := GitHubMessage{}
-		json, err := os.ReadFile("./test_data/pull_request_review.json")
+		json, err := os.ReadFile("./testdata/pull_request_review.json")
 		if err != nil {
 			t.Error(err)
 		}
@@ -288,7 +316,7 @@ func TestGitHubMessageToPayload(t *testing.T) {
 
 	t.Run("pull_request_review_comment", func(t *testing.T) {
 		gm := GitHubMessage{}
-		json, err := os.ReadFile("./test_data/pull_request_review_comment.json")
+		json, err := os.ReadFile("./testdata/pull_request_review_comment.json")
 		if err != nil {
 			t.Error(err)
 		}
@@ -320,7 +348,7 @@ func TestGitHubMessageToPayload(t *testing.T) {
 
 	t.Run("pull_request_target", func(t *testing.T) {
 		gm := GitHubMessage{}
-		json, err := os.ReadFile("./test_data/pull_request_target.json")
+		json, err := os.ReadFile("./testdata/pull_request_target.json")
 		if err != nil {
 			t.Error(err)
 		}
@@ -353,7 +381,7 @@ func TestGitHubMessageToPayload(t *testing.T) {
 
 	t.Run("push", func(t *testing.T) {
 		gm := GitHubMessage{}
-		json, err := os.ReadFile("./test_data/push.json")
+		json, err := os.ReadFile("./testdata/push.json")
 		if err != nil {
 			t.Error(err)
 		}
@@ -388,7 +416,7 @@ func TestGitHubMessageToPayload(t *testing.T) {
 
 	t.Run("NOT targeted event", func(t *testing.T) {
 		gm := GitHubMessage{}
-		json, err := os.ReadFile("./test_data/not_targeted.json")
+		json, err := os.ReadFile("./testdata/not_targeted.json")
 		if err != nil {
 			t.Error(err)
 		}

@@ -5,27 +5,27 @@ import (
 	"fmt"
 
 	"github.com/SongCastle/ggnb/income/builder"
+	"github.com/SongCastle/ggnb/outcome/client"
 )
 
-func NewManager() AbstractManager {
+func NewManager(client client.AbstractClient) AbstractManager {
 	m := &Manager{}
-	m.Init()
+	m.Init(client)
 	return m
 }
 
 type AbstractManager interface {
-	Init()
-	Send(msg *bytes.Buffer) error
-	ReportErrorIf(err error) error
+	Init(client.AbstractClient)
+	Send(*bytes.Buffer) error
+	ReportErrorIf(error) error
 }
 
 type Manager struct {
-	client client
+	client client.AbstractClient
 }
 
-func (m *Manager) Init() {
-	m.client = &slackClient{}
-	m.client.Init()
+func (m *Manager) Init(client client.AbstractClient) {
+	m.client = client
 }
 
 func (m *Manager) Send(msg *bytes.Buffer) error {

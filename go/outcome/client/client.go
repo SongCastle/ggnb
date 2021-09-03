@@ -1,4 +1,4 @@
-package outcome
+package client
 
 import (
 	"bytes"
@@ -11,23 +11,29 @@ import (
 
 const WebHookUrl = "SLACK_WEBHOOK_URL"
 
-type client interface {
-	Init()
+func NewClient() AbstractClient {
+	// Only Slack
+	return &SlackClient{}
+}
+
+type AbstractClient interface {
+	Init() error
 	Post(buff *bytes.Buffer) ([]byte, error)
 }
 
-type slackClient struct {
+type SlackClient struct {
 	webHookUrl string
 }
 
-func (sc *slackClient) Init() {
+func (sc *SlackClient) Init() error {
 	sc.webHookUrl = os.Getenv(WebHookUrl)
+	if sc.webHookUrl == "" {
+		return errors.New("WebhookUrl is brank")
+	}
+	return nil
 }
 
-func (sc *slackClient) Post(msg *bytes.Buffer) ([]byte, error) {
-	if sc.webHookUrl == "" {
-		return nil, errors.New("WebhookUrl is brank")
-	}
+func (sc *SlackClient) Post(msg *bytes.Buffer) ([]byte, error) {
 	body, err := sc.request(msg)
 	if err != nil {
 		return nil, err
@@ -35,15 +41,15 @@ func (sc *slackClient) Post(msg *bytes.Buffer) ([]byte, error) {
 	return body, nil
 }
 
-func (sc *slackClient) request(msg *bytes.Buffer) ([]byte, error) {
+func (sc *SlackClient) request(msg *bytes.Buffer) ([]byte, error) {
 	req, err := http.NewRequest("POST", sc.webHookUrl, msg)
 	req.Header.Add("Content-Type", "application/json")
 	if err != nil {
 		return nil, err
 	}
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	c := &http.Client{}
+	resp, err := c.Do(req)
 	defer resp.Body.Close()
 	if err != nil {
 		return nil, err

@@ -43,7 +43,7 @@ func (gm *GitHubMessage) toGitHubEvent(payload interface{}) (interface{}, error)
 	if !ok {
 		return nil,  errors.New("invalid payload")
 	}
-	// check header
+	// Check header
 	headers, ok := _payload["headers"]
 	if !ok {
 		return nil, errors.New("missing headers")
@@ -52,7 +52,7 @@ func (gm *GitHubMessage) toGitHubEvent(payload interface{}) (interface{}, error)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("missing %s header", EventHeader))
 	}
-	// check body
+	// Check body
 	body, ok := _payload["body"]
 	if !ok {
 		return nil, errors.New("missing body")

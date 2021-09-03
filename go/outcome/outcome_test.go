@@ -5,36 +5,25 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/SongCastle/ggnb/outcome/client"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
-type mockedClient struct {
-  mock.Mock
-}
-
-func (_ *mockedClient) Init() {
-}
-
-func (m *mockedClient) Post(msg *bytes.Buffer) ([]byte, error) {
-	args := m.Called(msg)
-  return args[0].([]byte), args.Error(1)
-}
-
 func TestNewManager(t *testing.T) {
 	t.Parallel()
-	m := NewManager()
-	assert.IsType(t, m, &Manager{})
+	m := NewManager(&client.MockedClient{})
+	_, ok := m.(AbstractManager)
+	assert.True(t, ok)
 }
 
 func TestManagerInit(t *testing.T) {
 	t.Parallel()
-	assert := assert.New(t)
 
+	c := &client.MockedClient{}
 	m := &Manager{}
-	m.Init()
-	assert.IsType(m.client, &slackClient{})
-	assert.NotNil(m.client)
+	m.Init(c)
+	assert.IsType(t, m.client, c)
 }
 
 func TestManagerSend(t *testing.T) {
@@ -43,23 +32,24 @@ func TestManagerSend(t *testing.T) {
 	msg := bytes.NewBufferString(`{"body": "test"}`)
 
 	t.Run("no errors", func(t *testing.T) {
-		mc := &mockedClient{}
-		mc.On("Post", msg).Return([]byte("ok"), nil)
+		c := &client.MockedClient{}
+		c.On("Post", msg).Return([]byte("ok"), nil)
 
-		m := &Manager{client: mc}
+		m := &Manager{client: c}
 		err := m.Send(msg)
 		assert.Nil(err)
 	})
 
 	t.Run("error", func(t *testing.T) {
-		merr := "mocked"
 		var b []byte
-		mc := &mockedClient{}
-		mc.On("Post", msg).Return(b, errors.New(merr))
+		eemsg := "mocked"
 
-		m := &Manager{client: mc}
+		c := &client.MockedClient{}
+		c.On("Post", msg).Return(b, errors.New(eemsg))
+
+		m := &Manager{client: c}
 		err := m.Send(msg)
-		assert.EqualError(err, merr)
+		assert.EqualError(err, eemsg)
 	})
 }
 
@@ -68,22 +58,23 @@ func TestManagerReportErrorIf(t *testing.T) {
 	assert := assert.New(t)
 
 	t.Run("no errors", func(t *testing.T) {
-		mc := &mockedClient{}
-		mc.On("Post", mock.AnythingOfType("*bytes.Buffer")).Return([]byte("ok"), nil)
+		c := &client.MockedClient{}
+		c.On("Post", mock.AnythingOfType("*bytes.Buffer")).Return([]byte("ok"), nil)
 
-		m := &Manager{client: mc}
+		m := &Manager{client: c}
 		err := m.ReportErrorIf(nil)
 		assert.Nil(err)
 	})
 
 	t.Run("error", func(t *testing.T) {
-		merr, merr2 := "mocked", "mocked2"
 		var b []byte
-		mc := &mockedClient{}
-		mc.On("Post", mock.AnythingOfType("*bytes.Buffer")).Return(b, errors.New(merr2))
+		eemsg, eemsg2 := "mocked", "mocked2"
 
-		m := &Manager{client: mc}
-		err := m.ReportErrorIf(errors.New(merr))
-		assert.EqualError(err, merr)
+		c := &client.MockedClient{}
+		c.On("Post", mock.AnythingOfType("*bytes.Buffer")).Return(b, errors.New(eemsg2))
+
+		m := &Manager{client: c}
+		err := m.ReportErrorIf(errors.New(eemsg))
+		assert.EqualError(err, eemsg)
 	})
 }
