@@ -26,10 +26,10 @@ jobs:
 
     - id: test
       run: |
-        result=$(go test ./...)
+        result=$(go test ./...) || true
         echo "$result"
         result=$(echo "$result" | sed -z 's/\n/\\n/g')
-        echo "::set-output name=result::$result" || true
+        echo "::set-output name=result::$result"
 
   comment:
     runs-on: ubuntu-latest
