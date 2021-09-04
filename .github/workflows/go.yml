@@ -41,7 +41,7 @@ jobs:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             if (context.issue.number) {
-              let body = "${{needs.test.outputs.result}}"
+              let body = "${{needs.test.outputs.result}}".trim()
               const regex = new RegExp('(^|\n)FAIL')
               let fail = regex.test(body)
               const emoji = fail ? ':-1:' : ':+1:'
