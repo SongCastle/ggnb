@@ -45,7 +45,7 @@ func TestHandlerNew(t *testing.T) {
 
 func TestLocalHandlerInit(t *testing.T) {
 	h := &localHandler{}
-	assert.Panics(
+	assert.NotPanics(
 		t,
 		func() {
 			h.Init(
