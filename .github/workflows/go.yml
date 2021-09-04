@@ -26,7 +26,7 @@ jobs:
 
     - id: test
       run: |
-        result=$(go test ./...) || status=$(echo $?) || true
+        result=$(go test ./...) || status=$(echo $?)
         echo "$result"
         result=$(echo "$result" | sed -z 's/\n/\\n/g')
         echo "::set-output name=result::$result"
@@ -35,7 +35,7 @@ jobs:
   comment:
     runs-on: ubuntu-latest
 
-    if: ${{ always() }}
+    if: always()
     needs: test
 
     steps:
