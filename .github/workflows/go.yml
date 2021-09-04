@@ -27,8 +27,7 @@ jobs:
     - id: test
       run: |
         result=$(go test ./...)
-        echo $result
-        echo "::set-output name=result::$result"
+        echo "::set-output name=result::\"$result\""
 
   comment:
     runs-on: ubuntu-latest
