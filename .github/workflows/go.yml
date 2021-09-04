@@ -42,9 +42,9 @@ jobs:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             if (context.issue.number) {
-              let body = "${{needs.test.outputs.result}}".trim()
+              const body = "${{needs.test.outputs.result}}".trim()
               const regex = new RegExp('(^|\n)FAIL')
-              let fail = regex.test(body)
+              const fail = regex.test(body)
               const emoji = fail ? ':-1:' : ':+1:'
               await github.issues.createComment({
                 issue_number: context.issue.number,
