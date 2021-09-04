@@ -26,7 +26,7 @@ jobs:
 
     - id: test
       run: |
-        result="$(go test ./...)"
+        result=$(go test ./... | sed -z 's/\n/\\n/g')
         echo "::set-output name=result::$result"
 
   comment:
