@@ -2,52 +2,37 @@ package income
 
 import (
 	"bytes"
-	"errors"
-	"fmt"
-	"os"
 
 	"github.com/SongCastle/ggnb/income/message"
 )
 
-const (
-	TypeEnv = "INCOME_TYPE"
-	GitHubType = "github"
-)
-
-func NewManager() (AbstractManager, error) {
+func NewManager(msg message.AbstractMessage) AbstractManager {
 	m := &Manager{}
-	if err := m.Init(); err != nil {
-		return nil, err
-	}
-	return m, nil
+	m.Init(msg)
+	return m
 }
 
 type AbstractManager interface {
-	Init() error
-	ToPayload(payload interface{}) (*bytes.Buffer, error)
-	ToDummyPayload() (*bytes.Buffer, error)
+	Init(message message.AbstractMessage)
+	BuildMessage(payload interface{}) (*bytes.Buffer, error)
+	BuildDummyMessage() (*bytes.Buffer, error)
 }
 
 type Manager struct {
-	message message.Message
+	message message.AbstractMessage
 }
 
-func (m *Manager) Init() error {
-	switch os.Getenv(TypeEnv) {
-	case GitHubType:
-		m.message = &message.GitHubMessage{}
-		return nil
-	}
-	return errors.New(fmt.Sprintf("Invalid %s", TypeEnv))
+func (m *Manager) Init(message message.AbstractMessage) {
+	m.message = message
 }
 
-func (m *Manager) ToPayload(payload interface{}) (*bytes.Buffer, error) {
+func (m *Manager) BuildMessage(payload interface{}) (*bytes.Buffer, error) {
 	if err := m.message.Init(payload); err != nil {
 		return nil, err
 	}
 	return m.message.ToPayload()
 }
 
-func (m *Manager) ToDummyPayload() (*bytes.Buffer, error) {
+func (m *Manager) BuildDummyMessage() (*bytes.Buffer, error) {
 	return m.message.ToDummyPayload()
 }

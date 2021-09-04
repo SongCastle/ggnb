@@ -1,34 +1,24 @@
 package handler
 
 import (
-	"fmt"
-
 	"github.com/SongCastle/ggnb/income"
 	"github.com/SongCastle/ggnb/outcome"
 )
 
 type localHandler struct {
-	in income.AbstractManager
-	out outcome.AbstractManager
+	In income.AbstractManager
+	Out outcome.AbstractManager
 }
 
-func (lh *localHandler) Init() error {
-	var err error
-	lh.in, err = income.NewManager()
-	if err != nil {
-		fmt.Printf("Init failed: %v\n", err)
-		return err
-	}
-	lh.out = outcome.NewManager()
-	return nil
+func (lh *localHandler) Init(in income.AbstractManager, out outcome.AbstractManager) {
+	lh.In = in
+	lh.Out = out
 }
 
 func (lh *localHandler) Start() {
-	if lh.in != nil && lh.out != nil {
-		msg, err := lh.in.ToDummyPayload()
-		if err == nil {
-			err = lh.out.Send(msg)
-		}
-		lh.out.ReportErrorIf(err)
+	msg, err := lh.In.BuildDummyMessage()
+	if err == nil {
+		err = lh.Out.Send(msg)
 	}
+	lh.Out.ReportErrorIf(err)
 }
