@@ -1,0 +1,57 @@
+name: go
+
+on: pull_request
+
+defaults:
+  run:
+    working-directory: ./go
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    outputs:
+      result: ${{steps.test.outputs.result}}
+
+    steps:
+    - uses: actions/checkout@v2
+    - run: git status
+    - run: git log
+
+    - uses: actions/setup-go@v2
+      with:
+        go-version: 1.16.7
+
+    - id: test
+      run: |
+        result=$(go test ./...) || status=$(echo $?)
+        echo "$result"
+        result=$(echo "$result" | sed -z 's/\n/\\n/g')
+        echo "::set-output name=result::$result"
+        exit $status
+
+  comment:
+    runs-on: ubuntu-latest
+
+    if: always()
+    needs: test
+
+    steps:
+      - uses: actions/github-script@v4
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            if (context.issue.number) {
+              const body = "${{needs.test.outputs.result}}".trim()
+              const regex = new RegExp('(^|\n)FAIL')
+              const fail = regex.test(body)
+              const emoji = fail ? ':-1:' : ':+1:'
+              await github.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: [emoji, '```', body, '```'].join('\n')
+              })
+            } else {
+              console.log('Skipped')
+            }
