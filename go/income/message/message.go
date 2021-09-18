@@ -13,7 +13,7 @@ const (
 )
 
 type AbstractMessage interface {
-	Init(payload interface{}) error
+	Init(headers, body interface{}) error
 	ToPayload() (*bytes.Buffer, error)
 	ToDummyPayload() (*bytes.Buffer, error)
 }

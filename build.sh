@@ -4,6 +4,8 @@ mod='github.com/SongCastle/ggnb'
 app="/go/src/${mod}"
 main="${app}/main.go"
 
+onlyBuild=$1
+
 cd $app
 
 if [ ! -e "${app}/go.mod" ]; then
@@ -27,4 +29,6 @@ if [ ! $? = 0 ]; then
   exit 1
 fi
 
-$bin
+if [ ! -z $onlyBuild ]; then
+  $bin
+fi

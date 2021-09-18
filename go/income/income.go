@@ -14,7 +14,7 @@ func NewManager(msg message.AbstractMessage) AbstractManager {
 
 type AbstractManager interface {
 	Init(message message.AbstractMessage)
-	BuildMessage(payload interface{}) (*bytes.Buffer, error)
+	BuildMessage(headers, body interface{}) (*bytes.Buffer, error)
 	BuildDummyMessage() (*bytes.Buffer, error)
 }
 
@@ -26,8 +26,8 @@ func (m *Manager) Init(message message.AbstractMessage) {
 	m.message = message
 }
 
-func (m *Manager) BuildMessage(payload interface{}) (*bytes.Buffer, error) {
-	if err := m.message.Init(payload); err != nil {
+func (m *Manager) BuildMessage(headers, body interface{}) (*bytes.Buffer, error) {
+	if err := m.message.Init(headers, body); err != nil {
 		return nil, err
 	}
 	return m.message.ToPayload()

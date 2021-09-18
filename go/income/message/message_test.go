@@ -42,40 +42,35 @@ func TestNewMessage(t *testing.T) {
 func TestGitHubMessageInit(t *testing.T) {
 	t.Parallel()
 	assert := assert.New(t)
+	body := `{"msg": "xxx"}`
 
-	t.Run("with nil", func(t *testing.T) {
+	t.Run("invalid headers", func(t *testing.T) {
 		gm := GitHubMessage{}
-		err := gm.Init(nil)
-		assert.EqualError(err, "invalid payload")
+		err := gm.Init("headers", &body)
+		assert.EqualError(err, "invalid headers")
 	})
 
-	t.Run("without headers", func(t *testing.T) {
+	t.Run("invalid body", func(t *testing.T) {
 		gm := GitHubMessage{}
-		err := gm.Init(fields{})
-		assert.EqualError(err, "missing headers")
+		err := gm.Init(map[string]string{EventHeader: "push"}, 0)
+		assert.EqualError(err, "invalid body")
 	})
 
 	t.Run("without GitHub Event header", func(t *testing.T) {
 		gm := GitHubMessage{}
-		err := gm.Init(fields{"headers": fields{}})
+		err := gm.Init(map[string]string{"xxx": "xxx"}, &body)
 		assert.EqualError(err, fmt.Sprintf("missing %s header", EventHeader))
 	})
 
-	t.Run("with unknown GitHub Event header", func(t *testing.T) {
+	t.Run("unknown GitHub Event header", func(t *testing.T) {
 		gm := GitHubMessage{}
-		err := gm.Init(fields{"headers": fields{EventHeader: "xxxxx"}, "body": "{}"})
-		assert.EqualError(err, "unknown X-Github-Event in message: xxxxx")
+		err := gm.Init(map[string]string{EventHeader: "xxx"}, &body)
+		assert.EqualError(err, "unknown X-Github-Event in message: xxx")
 	})
 
-	t.Run("without body", func(t *testing.T) {
+	t.Run("valid", func(t *testing.T) {
 		gm := GitHubMessage{}
-		err := gm.Init(fields{"headers": fields{EventHeader: "push"}})
-		assert.EqualError(err, "missing body")
-	})
-
-	t.Run("with body", func(t *testing.T) {
-		gm := GitHubMessage{}
-		err := gm.Init(fields{"headers": fields{EventHeader: "push"}, "body": "{}"})
+		err := gm.Init(map[string]string{EventHeader: "push"}, &body)
 		assert.Nil(err)
 		_, ok := gm.event.(*pushEvent)
 		assert.True(ok)
@@ -94,10 +89,8 @@ func TestGitHubMessageToPayload(t *testing.T) {
 		}
 
 		err = gm.Init(
-			fields{
-				"headers": fields{EventHeader: "commit_comment"},
-				"body": *(*string)(unsafe.Pointer(&json)),
-			},
+			map[string]string{EventHeader: "commit_comment"},
+			(*string)(unsafe.Pointer(&json)),
 		)
 		assert.Nil(err)
 
@@ -127,10 +120,8 @@ func TestGitHubMessageToPayload(t *testing.T) {
 		}
 
 		err = gm.Init(
-			fields{
-				"headers": fields{EventHeader: "create"},
-				"body": *(*string)(unsafe.Pointer(&json)),
-			},
+			map[string]string{EventHeader: "create"},
+			(*string)(unsafe.Pointer(&json)),
 		)
 		assert.Nil(err)
 
@@ -159,10 +150,8 @@ func TestGitHubMessageToPayload(t *testing.T) {
 		}
 
 		err = gm.Init(
-			fields{
-				"headers": fields{EventHeader: "delete"},
-				"body": *(*string)(unsafe.Pointer(&json)),
-			},
+			map[string]string{EventHeader: "delete"},
+			(*string)(unsafe.Pointer(&json)),
 		)
 		assert.Nil(err)
 
@@ -191,10 +180,8 @@ func TestGitHubMessageToPayload(t *testing.T) {
 		}
 
 		err = gm.Init(
-			fields{
-				"headers": fields{EventHeader: "issue_comment"},
-				"body": *(*string)(unsafe.Pointer(&json)),
-			},
+			map[string]string{EventHeader: "issue_comment"},
+			(*string)(unsafe.Pointer(&json)),
 		)
 		assert.Nil(err)
 
@@ -223,10 +210,8 @@ func TestGitHubMessageToPayload(t *testing.T) {
 		}
 
 		err = gm.Init(
-			fields{
-				"headers": fields{EventHeader: "issues"},
-				"body": *(*string)(unsafe.Pointer(&json)),
-			},
+			map[string]string{EventHeader: "issues"},
+			(*string)(unsafe.Pointer(&json)),
 		)
 		assert.Nil(err)
 
@@ -256,10 +241,8 @@ func TestGitHubMessageToPayload(t *testing.T) {
 		}
 
 		err = gm.Init(
-			fields{
-				"headers": fields{EventHeader: "pull_request"},
-				"body": *(*string)(unsafe.Pointer(&json)),
-			},
+			map[string]string{EventHeader: "pull_request"},
+			(*string)(unsafe.Pointer(&json)),
 		)
 		assert.Nil(err)
 
@@ -289,10 +272,8 @@ func TestGitHubMessageToPayload(t *testing.T) {
 		}
 
 		err = gm.Init(
-			fields{
-				"headers": fields{EventHeader: "pull_request_review"},
-				"body": *(*string)(unsafe.Pointer(&json)),
-			},
+			map[string]string{EventHeader: "pull_request_review"},
+			(*string)(unsafe.Pointer(&json)),
 		)
 		assert.Nil(err)
 
@@ -322,10 +303,8 @@ func TestGitHubMessageToPayload(t *testing.T) {
 		}
 
 		err = gm.Init(
-			fields{
-				"headers": fields{EventHeader: "pull_request_review_comment"},
-				"body": *(*string)(unsafe.Pointer(&json)),
-			},
+			map[string]string{EventHeader: "pull_request_review_comment"},
+			(*string)(unsafe.Pointer(&json)),
 		)
 		assert.Nil(err)
 
@@ -354,10 +333,8 @@ func TestGitHubMessageToPayload(t *testing.T) {
 		}
 
 		err = gm.Init(
-			fields{
-				"headers": fields{EventHeader: "pull_request_target"},
-				"body": *(*string)(unsafe.Pointer(&json)),
-			},
+			map[string]string{EventHeader: "pull_request_target"},
+			(*string)(unsafe.Pointer(&json)),
 		)
 		assert.Nil(err)
 
@@ -387,10 +364,8 @@ func TestGitHubMessageToPayload(t *testing.T) {
 		}
 
 		err = gm.Init(
-			fields{
-				"headers": fields{EventHeader: "push"},
-				"body": *(*string)(unsafe.Pointer(&json)),
-			},
+			map[string]string{EventHeader: "push"},
+			(*string)(unsafe.Pointer(&json)),
 		)
 		assert.Nil(err)
 
@@ -422,10 +397,8 @@ func TestGitHubMessageToPayload(t *testing.T) {
 		}
 
 		err = gm.Init(
-			fields{
-				"headers": fields{EventHeader: "check_run"},
-				"body": *(*string)(unsafe.Pointer(&json)),
-			},
+			map[string]string{EventHeader: "check_run"},
+			(*string)(unsafe.Pointer(&json)),
 		)
 		assert.Nil(err)
 

@@ -1,10 +1,13 @@
 version: '3'
 services:
   ggnb:
-    build:
-      context: '.'
+    build: .
+    image: ggnb
+    container_name: ggnb
     volumes:
       - ./go:/go/src/github.com/SongCastle/ggnb
     env_file:
         - .env
+    ports:
+      - '9000:8080'
     tty: true
