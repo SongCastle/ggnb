@@ -14,8 +14,8 @@ type MockedIncomeManager struct {
 func (im *MockedIncomeManager) Init(message message.AbstractMessage) {
 }
 
-func (im *MockedIncomeManager) BuildMessage(payload interface{}) (*bytes.Buffer, error) {
-	args := im.Called(payload)
+func (im *MockedIncomeManager) BuildMessage(headers, body interface{}) (*bytes.Buffer, error) {
+	args := im.Called(headers, body)
 	return args[0].(*bytes.Buffer), args.Error(1)
 }
 

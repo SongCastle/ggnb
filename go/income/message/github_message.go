@@ -10,7 +10,10 @@ import (
 	"github.com/google/go-github/v38/github"
 )
 
-const EventHeader = "x-github-event"
+const (
+	EventHeader = "x-github-event"
+	EventHeaderCap = "X-GitHub-Event"
+)
 
 type commitCommentEvent = github.CommitCommentEvent
 type createEvent = github.CreateEvent
@@ -29,8 +32,16 @@ type GitHubMessage struct {
 	event interface{}
 }
 
-func (gm *GitHubMessage) Init(payload interface{}) error {
-	event, err := gm.toGitHubEvent(payload)
+func (gm *GitHubMessage) Init(headers, body interface{}) error {
+	_headers, ok := headers.(map[string]string)
+	if !ok {
+		return errors.New("invalid headers")
+	}
+	_body, ok := body.(*string)
+	if !ok {
+		return errors.New("invalid body")
+	}
+	event, err := gm.toGitHubEvent(_headers, _body)
 	if err != nil {
 		return err
 	}
@@ -38,26 +49,23 @@ func (gm *GitHubMessage) Init(payload interface{}) error {
 	return nil
 }
 
-func (gm *GitHubMessage) toGitHubEvent(payload interface{}) (interface{}, error) {
-	_payload, ok := payload.(fields)
-	if !ok {
-		return nil,  errors.New("invalid payload")
+func (gm *GitHubMessage) toGitHubEvent(headers map[string]string, body *string) (interface{}, error) {
+	eventType, err := extractGitHubEvent(headers)
+	if err != nil {
+		return nil, err
 	}
-	// Check header
-	headers, ok := _payload["headers"]
+	return github.ParseWebHook(eventType, []byte(*body))
+}
+
+func extractGitHubEvent(headers map[string]string) (string, error) {
+	eventType, ok := headers[EventHeader]
 	if !ok {
-		return nil, errors.New("missing headers")
+		eventType, ok = headers[EventHeaderCap]
 	}
-	eventType, ok := headers.(fields)[EventHeader]
 	if !ok {
-		return nil, errors.New(fmt.Sprintf("missing %s header", EventHeader))
+		return "", errors.New(fmt.Sprintf("missing %s header", EventHeader))
 	}
-	// Check body
-	body, ok := _payload["body"]
-	if !ok {
-		return nil, errors.New("missing body")
-	}
-	return github.ParseWebHook(eventType.(string), []byte(body.(string)))
+	return eventType, nil
 }
 
 func (gm *GitHubMessage) ToPayload() (*bytes.Buffer, error) {
@@ -89,9 +97,9 @@ func (gm *GitHubMessage) ToPayload() (*bytes.Buffer, error) {
 
 func (gm *GitHubMessage) ToDummyPayload() (*bytes.Buffer, error) {
 	a := builder.NewAttachment()
-	a.InsertField("アカウント", "bot", true)
-	a.InsertField("アクション", "debug", true)
-	a.InsertField("内容", "ok")
+	a.InsertField("アカウント", "Bot", true)
+	a.InsertField("アクション", "Invoke", true)
+	a.InsertField("内容", "OK")
 	return a.Build()
 }
 

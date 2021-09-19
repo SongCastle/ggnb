@@ -26,5 +26,3 @@ if [ ! $? = 0 ]; then
   echo 'build filed'
   exit 1
 fi
-
-$bin

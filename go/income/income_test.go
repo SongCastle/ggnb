@@ -30,16 +30,17 @@ func TestManagerInit(t *testing.T) {
 func TestManagerBuildMessage(t *testing.T) {
 	t.Parallel()
 	assert := assert.New(t)
-	payload := map[string]string{"headers": "test", "body": "test"}
+	headers := map[string]string{"xxx": "xxx"}
+	body := `{"body": "test"}`
 
 	t.Run("no errors", func(t *testing.T) {
-		ebuf := bytes.NewBufferString(`{"body": "test"}`)
+		ebuf := bytes.NewBufferString("ok")
 		mm := &message.MockedMessage{}
-		mm.On("Init", payload).Return(nil)
+		mm.On("Init", headers, body).Return(nil)
 		mm.On("ToPayload").Return(ebuf, nil)
 
 		m := &Manager{message: mm}
-		buf, err := m.BuildMessage(payload)
+		buf, err := m.BuildMessage(headers, body)
 		assert.Nil(err)
 		assert.Equal(buf, ebuf)
 	})
@@ -50,21 +51,21 @@ func TestManagerBuildMessage(t *testing.T) {
 
 		t.Run("Init", func(t *testing.T) {
 			mm := &message.MockedMessage{}
-			mm.On("Init", payload).Return(eerr)
+			mm.On("Init", headers, body).Return(eerr)
 
 			m := &Manager{message: mm}
-			_, err := m.BuildMessage(payload)
+			_, err := m.BuildMessage(headers, body)
 			assert.EqualError(err, eemsg)
 		})
 
 		t.Run("ToPayload", func(t *testing.T) {
 			var ebuf *bytes.Buffer
 			mm := &message.MockedMessage{}
-			mm.On("Init", payload).Return(nil)
+			mm.On("Init", headers, body).Return(nil)
 			mm.On("ToPayload").Return(ebuf, eerr)
 
 			m := &Manager{message: mm}
-			_, err := m.BuildMessage(payload)
+			_, err := m.BuildMessage(headers, body)
 			assert.EqualError(err, eemsg)
 		})
 	})
