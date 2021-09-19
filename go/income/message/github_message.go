@@ -97,9 +97,9 @@ func (gm *GitHubMessage) ToPayload() (*bytes.Buffer, error) {
 
 func (gm *GitHubMessage) ToDummyPayload() (*bytes.Buffer, error) {
 	a := builder.NewAttachment()
-	a.InsertField("アカウント", "bot", true)
-	a.InsertField("アクション", "debug", true)
-	a.InsertField("内容", "ok")
+	a.InsertField("アカウント", "Bot", true)
+	a.InsertField("アクション", "Invoke", true)
+	a.InsertField("内容", "OK")
 	return a.Build()
 }
 

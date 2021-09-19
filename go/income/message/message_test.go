@@ -418,9 +418,9 @@ func TestGitHubMessageToDummyPayload(t *testing.T) {
 	assert.IsType(buf, &bytes.Buffer{})
 
 	a := builder.NewAttachment()
-	a.InsertField("アカウント", "bot", true)
-	a.InsertField("アクション", "debug", true)
-	a.InsertField("内容", "ok")
+	a.InsertField("アカウント", "Bot", true)
+	a.InsertField("アクション", "Invoke", true)
+	a.InsertField("内容", "OK")
 	ebuf, err := a.Build()
 	if err != nil {
 		t.Error(err)

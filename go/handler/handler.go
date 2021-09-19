@@ -9,7 +9,7 @@ import (
 	"github.com/SongCastle/ggnb/outcome/client"
 )
 
-const DEBUG = "DEBUG"
+const LOCAL = "LOCAL"
 
 type abstractHandler interface {
 	Init(income.AbstractManager, outcome.AbstractManager)
@@ -31,5 +31,5 @@ func New(am message.AbstractMessage, ac client.AbstractClient) abstractHandler {
 }
 
 func onLambda() bool {
-	return os.Getenv(DEBUG) == ""
+	return os.Getenv(LOCAL) == ""
 }

@@ -15,13 +15,13 @@ import (
 
 func TestHandlerNew(t *testing.T) {
 	assert := assert.New(t)
-	beforeDebug := os.Getenv(DEBUG)
+	beforeLocal := os.Getenv(LOCAL)
 
 	m := &message.MockedMessage{}
 	c := &client.MockedClient{}
 
 	t.Run("local", func(t *testing.T) {
-		if err := os.Setenv(DEBUG, "1"); err != nil {
+		if err := os.Setenv(LOCAL, "1"); err != nil {
 			t.Fatal(err)
 		}
 		h := New(m, c)
@@ -29,7 +29,7 @@ func TestHandlerNew(t *testing.T) {
 	})
 
 	t.Run("lambda", func(t *testing.T) {
-		if err := os.Unsetenv(DEBUG); err != nil {
+		if err := os.Unsetenv(LOCAL); err != nil {
 			t.Fatal(err)
 		}
 		h := New(m, c)
@@ -37,7 +37,7 @@ func TestHandlerNew(t *testing.T) {
 	})
 
 	t.Cleanup(func(){
-		if err := os.Setenv(DEBUG, beforeDebug); err != nil {
+		if err := os.Setenv(LOCAL, beforeLocal); err != nil {
 			t.Fatal(err)
 		}
 	})

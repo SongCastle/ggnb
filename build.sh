@@ -4,8 +4,6 @@ mod='github.com/SongCastle/ggnb'
 app="/go/src/${mod}"
 main="${app}/main.go"
 
-onlyBuild=$1
-
 cd $app
 
 if [ ! -e "${app}/go.mod" ]; then
@@ -27,8 +25,4 @@ GOOS=linux CGO_ENABLED=0 go build -o $bin
 if [ ! $? = 0 ]; then
   echo 'build filed'
   exit 1
-fi
-
-if [ ! -z $onlyBuild ]; then
-  $bin
 fi

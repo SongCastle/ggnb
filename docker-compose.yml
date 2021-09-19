@@ -10,4 +10,3 @@ services:
         - .env
     ports:
       - '9000:8080'
-    tty: true
