@@ -1,8 +1,7 @@
-# ggnb
-Go GitHub Notification Bot
-(GitHub to Slack)
+# ggnb (Go GitHub Notification Bot)
+GitHub Event を Slack へ通知するための Bot です。
 
-![ggnb](https://user-images.githubusercontent.com/47803499/133927449-62b92626-c913-437d-bc30-b92655a5ff1f.png)
+<img src="https://user-images.githubusercontent.com/47803499/133951995-8205c595-f559-4814-801d-d65b296a012c.png" width="720px" />
 
 GitHub Event を Slack へ通知するための Bot です。
 
@@ -66,7 +65,7 @@ aws ecr get-login-password --region <region> | docker login --username AWS --pas
 ```
 
 補足:
-AWS CLI のインストール、必要な IAM の設定等は事前に必要となります。
+AWS CLI のインストール、IAM の設定等は事前に必要となります。
 
 ```
 # アクセスポリシー設定例
