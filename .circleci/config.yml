@@ -20,17 +20,17 @@ commands:
   update_lambda:
     steps:
       - run:
+          name: Copy .env.sample
+          command: cp .env.sample .env
+      - run:
           name: Docker-Compose build
-          command: |
-            docker-compose build
+          command: docker-compose build
       - run:
           name: Authorize Docker Client
-          command: |
-            aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCESS_KEY_ID_STG}.dkr.ecr.${AWS_REGION}.amazonaws.com
+          command: aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCESS_KEY_ID_STG}.dkr.ecr.${AWS_REGION}.amazonaws.com
       - run:
           name: Update Lambda Function
-          command: |
-            ACCOUNT_ID=${AWS_ACCESS_KEY_ID_STG} REGION=#{AWS_REGION} ./deploy.sh
+          command: ACCOUNT_ID=${AWS_ACCESS_KEY_ID_STG} REGION=${AWS_REGION} ./deploy.sh
 
   notify_pass:
     steps:
