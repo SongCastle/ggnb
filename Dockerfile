@@ -1,6 +1,6 @@
 FROM golang:1.16.7 as build
 
-COPY go build.sh /go/src/github.com/SongCastle/ggnb
+COPY go build.sh /go/src/github.com/SongCastle/ggnb/
 RUN cd /go/src/github.com/SongCastle && \
     mv ggnb/build.sh . && chmod 755 ./build.sh && ./build.sh
 
