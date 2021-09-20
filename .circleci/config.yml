@@ -150,7 +150,7 @@ commands:
           event: fail
 
 jobs:
-  build:
+  deploy:
     executor: deploy_container
     steps:
       - checkout
@@ -161,9 +161,9 @@ jobs:
 
 workflows:
   version: 2
-  deploy:
-    filters:
-      branches:
-        only: main
+  deploy_code:
     jobs:
-      - build
+      - deploy:
+          filters:
+            branches:
+              only: main
