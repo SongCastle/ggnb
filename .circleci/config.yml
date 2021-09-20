@@ -25,8 +25,7 @@ commands:
 
   update_lambda:
     steps:
-      - setup_remote_docker:
-          docker_layer_caching: true
+      - setup_remote_docker
       - run:
           name: Docker-Compose build
           command: docker-compose build
