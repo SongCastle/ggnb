@@ -17,13 +17,16 @@ commands:
       - aws-cli/setup:  
           override-installed: true
 
-  update_lambda:
+  setup_env:
     steps:
       - run:
           name: Copy .env.sample
-          command: |
-            cp .env.sample .env
-            ls -la
+          command: cp .env.sample .env
+
+  update_lambda:
+    steps:
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: Docker-Compose build
           command: docker-compose build
@@ -157,6 +160,7 @@ jobs:
     steps:
       - checkout
       - setup_aws_cil
+      - setup_env
       - update_lambda
       - notify_pass
       - notify_fail
