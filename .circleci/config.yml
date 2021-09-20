@@ -21,7 +21,9 @@ commands:
     steps:
       - run:
           name: Copy .env.sample
-          command: cp .env.sample .env
+          command: |
+            cp .env.sample .env
+            ls -la
       - run:
           name: Docker-Compose build
           command: docker-compose build
@@ -52,15 +54,15 @@ commands:
                   "fields": [
                     {
                       "type": "mrkdwn",
-                      "text": "*Project*:\\n$CIRCLE_PROJECT_REPONAME"
+                      "text": "*Project*:\n$CIRCLE_PROJECT_REPONAME"
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*When*:\\n$(date +'%m/%d/%Y %T')"
+                      "text": "*When*:\n$(date +'%m/%d/%Y %T')"
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*Branch*:\\n$CIRCLE_BRANCH"
+                      "text": "*Branch*:\n$CIRCLE_BRANCH"
                     }
                   ],
                   "accessory": {
@@ -115,15 +117,15 @@ commands:
                   "fields": [
                     {
                       "type": "mrkdwn",
-                      "text": "*Project*:\\n$CIRCLE_PROJECT_REPONAME"
+                      "text": "*Project*:\n$CIRCLE_PROJECT_REPONAME"
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*Branch*:\\n$CIRCLE_BRANCH"
+                      "text": "*Branch*:\n$CIRCLE_BRANCH"
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*Author*:\\n$CIRCLE_USERNAME"
+                      "text": "*Author*:\n$CIRCLE_USERNAME"
                     }
                   ],
                   "accessory": {
