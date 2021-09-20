@@ -17,7 +17,7 @@ commands:
       - aws-cli/setup:  
           override-installed: true
 
-  setup_env:
+  setup_envfile:
     steps:
       - run:
           name: Copy .env.sample
@@ -159,7 +159,7 @@ jobs:
     steps:
       - checkout
       - setup_aws_cil
-      - setup_env
+      - setup_envfile
       - update_lambda
       - notify_pass
       - notify_fail
