@@ -21,7 +21,9 @@ commands:
     steps:
       - run:
           name: Copy .env.sample
-          command: cp .env.sample .env
+          command: |
+            cp .env.sample .env
+            echo "Create diff"
 
   update_lambda:
     steps:
