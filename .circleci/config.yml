@@ -31,10 +31,10 @@ commands:
           command: docker-compose build
       - run:
           name: Authorize Docker Client
-          command: aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_SECRET_ACCESS_KEY}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
+          command: aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin "${AWS_ACCESS_KEY_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
       - run:
           name: Update Lambda Function
-          command: ACCOUNT_ID=${AWS_SECRET_ACCESS_KEY} REGION=${AWS_DEFAULT_REGION} ./deploy.sh
+          command: ACCOUNT_ID=${AWS_ACCESS_KEY_ID} REGION=${AWS_DEFAULT_REGION} ./deploy.sh
 
   notify_pass:
     steps:
