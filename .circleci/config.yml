@@ -17,20 +17,24 @@ commands:
       - aws-cli/setup:  
           override-installed: true
 
-  update_lambda:
+  setup_env:
     steps:
       - run:
+          name: Copy .env.sample
+          command: cp .env.sample .env
+
+  update_lambda:
+    steps:
+      - setup_remote_docker
+      - run:
           name: Docker-Compose build
-          command: |
-            docker-compose build
+          command: docker-compose build
       - run:
           name: Authorize Docker Client
-          command: |
-            aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCESS_KEY_ID_STG}.dkr.ecr.${AWS_REGION}.amazonaws.com
+          command: aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
       - run:
           name: Update Lambda Function
-          command: |
-            ACCOUNT_ID=${AWS_ACCESS_KEY_ID_STG} REGION=#{AWS_REGION} ./deploy.sh
+          command: ACCOUNT_ID=${AWS_ACCOUNT_ID} REGION=${AWS_DEFAULT_REGION} ./deploy.sh
 
   notify_pass:
     steps:
@@ -52,15 +56,15 @@ commands:
                   "fields": [
                     {
                       "type": "mrkdwn",
-                      "text": "*Project*:\\n$CIRCLE_PROJECT_REPONAME"
+                      "text": "*Project*:\n$CIRCLE_PROJECT_REPONAME"
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*When*:\\n$(date +'%m/%d/%Y %T')"
+                      "text": "*When*:\n$(date +'%m/%d/%Y %T')"
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*Branch*:\\n$CIRCLE_BRANCH"
+                      "text": "*Branch*:\n$CIRCLE_BRANCH"
                     }
                   ],
                   "accessory": {
@@ -115,15 +119,15 @@ commands:
                   "fields": [
                     {
                       "type": "mrkdwn",
-                      "text": "*Project*:\\n$CIRCLE_PROJECT_REPONAME"
+                      "text": "*Project*:\n$CIRCLE_PROJECT_REPONAME"
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*Branch*:\\n$CIRCLE_BRANCH"
+                      "text": "*Branch*:\n$CIRCLE_BRANCH"
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*Author*:\\n$CIRCLE_USERNAME"
+                      "text": "*Author*:\n$CIRCLE_USERNAME"
                     }
                   ],
                   "accessory": {
@@ -155,6 +159,7 @@ jobs:
     steps:
       - checkout
       - setup_aws_cil
+      - setup_env
       - update_lambda
       - notify_pass
       - notify_fail
