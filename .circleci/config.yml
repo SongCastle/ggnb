@@ -163,7 +163,4 @@ workflows:
   version: 2
   deploy_code:
     jobs:
-      - deploy:
-          filters:
-            branches:
-              only: main
+      - deploy
