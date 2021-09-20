@@ -16,21 +16,21 @@ jobs:
       result: ${{steps.test.outputs.result}}
 
     steps:
-    - uses: actions/checkout@v2
-    - run: git status
-    - run: git log
+      - uses: actions/checkout@v2
+      - run: git status
+      - run: git log
 
-    - uses: actions/setup-go@v2
-      with:
-        go-version: 1.16.7
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.16.7
 
-    - id: test
-      run: |
-        result=$(go test ./...) || status=$(echo $?)
-        echo "$result"
-        result=$(echo "$result" | sed -z 's/\n/\\n/g')
-        echo "::set-output name=result::$result"
-        exit $status
+      - id: test
+        run: |
+          result=$(go test ./...) || status=$(echo $?)
+          echo "$result"
+          result=$(echo "$result" | sed -z 's/\n/\\n/g')
+          echo "::set-output name=result::$result"
+          exit $status
 
   comment:
     runs-on: ubuntu-latest
@@ -46,8 +46,7 @@ jobs:
             if (context.issue.number) {
               const body = "${{needs.test.outputs.result}}".trim()
               const regex = new RegExp('(^|\n)FAIL')
-              const fail = regex.test(body)
-              const emoji = fail ? ':-1:' : ':+1:'
+              const emoji = regex.test(body) ? ':-1:' : ':+1:'
               await github.issues.createComment({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
