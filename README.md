@@ -10,7 +10,7 @@ GitHub Event を Slack へ通知するための Bot です。
 本レポジトリを Clone します。
 
 ```
-git@github.com:SongCastle/ggnb.git
+git clone git@github.com:SongCastle/ggnb.git
 cd ggnb
 ```
 
