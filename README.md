@@ -90,4 +90,5 @@ cd ggnb
 
 7. GitHub 上で WebHooks を設定
 
-   通知したい GitHub レポジトリの Settings → WebHooks から、手順 5 で設定した API エンドポイント (API Gateway) の URL を設定してください。
+   通知したい GitHub レポジトリの Settings → WebHooks から、手順 5 で設定した API エンドポイント (API Gateway) の URL を設定してください。<br/>
+   また、Content-Type は application/json を指定してください。
