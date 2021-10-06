@@ -1,7 +1,7 @@
 # ggnb (Go GitHub Notification Bot)
 GitHub Event を Slack へ通知するための Bot です。
 
-<img src="https://user-images.githubusercontent.com/47803499/134014164-a85c8251-feae-44ed-8e46-6cffc01d6685.png" width="1280px" />
+<img src="https://user-images.githubusercontent.com/47803499/136190817-7aefe735-adb7-4cc0-8d76-3a47c491ca71.png" width="1280px" />
 
 <img src="https://user-images.githubusercontent.com/47803499/133927702-96bfd5c6-c3c9-41b3-acba-1ca27b39180d.png" width="720px" />
 
