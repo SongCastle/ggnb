@@ -30,7 +30,7 @@ cd ggnb
 3. イメージのビルド
 
    ```
-   docker-cmpose build
+   docker-compose build
    ```
 
 4. 起動
@@ -52,7 +52,7 @@ cd ggnb
 1. イメージのビルド
 
    ```
-   docker-cmpose build
+   docker-compose build
    ```
 
 2. Amazon ECR 上で Private レジストリ ggnb を作成
