@@ -45,8 +45,6 @@ cd ggnb
    ./test.sh
    ```
 
-   <img src="https://user-images.githubusercontent.com/47803499/133926341-7abe739b-742d-4e78-acb7-1991d07fe2c0.png" width="720px" />
-
 ## Lambda 環境
 
 1. イメージのビルド
