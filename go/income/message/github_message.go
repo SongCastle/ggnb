@@ -41,20 +41,23 @@ func (gm *GitHubMessage) Init(headers, body interface{}) error {
 	if !ok {
 		return errors.New("invalid body")
 	}
-	event, err := gm.toGitHubEvent(_headers, _body)
+	if err := gm.setGitHubEvent(_headers, _body); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (gm *GitHubMessage) setGitHubEvent(headers map[string]string, body *string) error {
+	eventType, err := extractGitHubEvent(headers)
+	if err != nil {
+		return err
+	}
+	event, err := github.ParseWebHook(eventType, []byte(*body))
 	if err != nil {
 		return err
 	}
 	gm.event = event
 	return nil
-}
-
-func (gm *GitHubMessage) toGitHubEvent(headers map[string]string, body *string) (interface{}, error) {
-	eventType, err := extractGitHubEvent(headers)
-	if err != nil {
-		return nil, err
-	}
-	return github.ParseWebHook(eventType, []byte(*body))
 }
 
 func extractGitHubEvent(headers map[string]string) (string, error) {
