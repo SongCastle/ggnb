@@ -1,7 +1,7 @@
 # ggnb (Go GitHub Notification Bot)
 GitHub Event を Slack へ通知するための Bot です。
 
-<img src="https://user-images.githubusercontent.com/47803499/134014164-a85c8251-feae-44ed-8e46-6cffc01d6685.png" width="1280px" />
+<img src="https://user-images.githubusercontent.com/47803499/136190817-7aefe735-adb7-4cc0-8d76-3a47c491ca71.png" width="1280px" />
 
 <img src="https://user-images.githubusercontent.com/47803499/133927702-96bfd5c6-c3c9-41b3-acba-1ca27b39180d.png" width="720px" />
 
@@ -30,7 +30,7 @@ cd ggnb
 3. イメージのビルド
 
    ```
-   docker-cmpose build
+   docker-compose build
    ```
 
 4. 起動
@@ -52,7 +52,7 @@ cd ggnb
 1. イメージのビルド
 
    ```
-   docker-cmpose build
+   docker-compose build
    ```
 
 2. Amazon ECR 上で Private レジストリ ggnb を作成
@@ -90,4 +90,5 @@ cd ggnb
 
 7. GitHub 上で WebHooks を設定
 
-   通知したい GitHub レポジトリの Settings → WebHooks から、手順 5 で設定した API エンドポイント (API Gateway) の URL を設定してください。
+   通知したい GitHub レポジトリの Settings → WebHooks から、手順 5 で設定した API エンドポイント (API Gateway) の URL を設定してください。<br/>
+   また、Content-Type は application/json を指定してください。
