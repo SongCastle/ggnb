@@ -7,15 +7,15 @@ import (
 )
 
 type MockedClient struct {
-  mock.Mock
+	mock.Mock
 }
 
 func (m *MockedClient) Init() error {
 	args := m.Called()
-  return args.Error(0)
+	return args.Error(0)
 }
 
 func (m *MockedClient) Post(msg *bytes.Buffer) ([]byte, error) {
 	args := m.Called(msg)
-  return args[0].([]byte), args.Error(1)
+	return args[0].([]byte), args.Error(1)
 }
